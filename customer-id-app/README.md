@@ -1,70 +1,174 @@
-# Getting Started with Create React App
+# AWS Project: Customer ID Management System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+This project is a fully integrated AWS-based system that provides a REST API, a Step Functions workflow, and a React-based frontend to manage customer IDs using DynamoDB. The infrastructure is built using AWS Lambda, API Gateway, S3, CloudFront, and IAM for security.
 
-In the project directory, you can run:
+## Table of Contents
 
-### `npm start`
+1. [Prerequisites](#prerequisites)
+2. [Architecture](#architecture)
+3. [Setup & Deployment Steps](#setup--deployment-steps)
+4. [Testing the API](#testing-the-api)
+5. [Frontend Deployment](#frontend-deployment)
+6. [Step Functions Workflow](#step-functions-workflow)
+7. [Security & IAM](#security--iam)
+8. [Final Testing](#final-testing)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Prerequisites
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **AWS Account** (Created a new AWS account)
+- **AWS CLI** installed and configured on the local machine
+- **Python & Boto3** installed for backend development
+- **React.js** for frontend development
 
-### `npm test`
+## Architecture
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Components Used:
 
-### `npm run build`
+- **DynamoDB**: Stores customer IDs
+- **AWS Lambda**: Handles backend logic
+- **API Gateway**: Exposes REST API endpoints
+- **React (Frontend)**: Provides a UI for adding/checking customer IDs
+- **S3 & CloudFront**: Hosts the frontend securely
+- **AWS Step Functions**: Automates customer ID management workflow
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Setup & Deployment Steps
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 1. AWS Account Setup
 
-### `npm run eject`
+- Created an AWS account
+- Configured IAM user and assigned necessary permissions
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 2. DynamoDB Setup
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Created a DynamoDB table named `customer_ids`
+- Defined **id (String)** as the partition key
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 3. Backend Development
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+#### Created Two Lambda Functions:
 
-## Learn More
+1. **put_customer_id**: Adds a new customer ID to the DynamoDB table
+2. **get_customer_id**: Checks if a customer ID exists and returns a JSON response
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 4. API Gateway Configuration
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- Created an API Gateway with **REST API endpoints**
+- Integrated with the Lambda functions
+- Enabled **CORS** for cross-origin access
 
-### Code Splitting
+### 5. React Frontend Development
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Developed a simple React app with **three components**:
+  - **AddCustomerID**: Adds an ID to DynamoDB
+  - **CheckCustomerID**: Checks if an ID exists
+  - **ResponseDisplay**: Shows the results
 
-### Analyzing the Bundle Size
+### 6. Frontend Deployment on AWS S3
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- Uploaded the built React app to an S3 bucket
+- Configured S3 bucket policy to restrict public access
+- Enabled website hosting on S3
 
-### Making a Progressive Web App
+### 7. CloudFront Configuration (HTTPS)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- Created a **CloudFront distribution** pointing to the S3 bucket
+- Configured an SSL certificate using **AWS Certificate Manager**
+- Linked the domain `cloudzoneprojects.info` to CloudFront
 
-### Advanced Configuration
+### 8. Step Functions Workflow
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- Created a **State Machine** with three Lambda functions:
+  - **check_customer_id**: Checks if ID exists
+  - **log_existing_id**: Logs the existing ID
+  - **add_new_id**: Adds a new ID if it doesn’t exist
+- Triggered the Step Function using **EventBridge** on API calls
 
-### Deployment
+### 9. Security & IAM Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- Restricted S3 bucket access to CloudFront only
+- Created an IAM **Read-Only User** for AWS resource access
+- Ensured minimal permissions for Lambda and API Gateway
 
-### `npm run build` fails to minify
+### 10. Final Deployment & Testing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Deployed API Gateway and tested using **Postman & cURL**
+- Verified React app interaction with API endpoints
+- Monitored **CloudWatch logs** for debugging and performance
+
+---
+
+## Testing the API
+
+To test API endpoints:
+
+### **Add a Customer ID**
+
+```bash
+curl -X PUT https://customer-id-app-123.execute-api.region.amazonaws.com/prod/customer -d '{"id": "12345"}' -H "Content-Type: application/json"
+```
+
+### **Check if a Customer ID Exists**
+
+```bash
+curl -X GET https://customer-id-app-123.execute-api.region.amazonaws.com/prod/customer?id=12345
+```
+
+Expected response:
+
+```json
+{ "exists": true }
+```
+
+---
+
+## Frontend Deployment
+
+- Access the deployed frontend at:
+  - 🔗 [https://cloudzoneprojects.info](https://cloudzoneprojects.info)
+- The app allows adding and verifying customer IDs
+
+---
+
+## Step Functions Workflow
+
+- Triggered automatically when a new customer ID is submitted
+- Can be monitored in AWS Step Functions console
+
+---
+
+## Security & IAM
+
+- **IAM Role for Lambda**: Minimal permissions for DynamoDB access
+- **S3 Bucket Policy**: Restricted to CloudFront only
+- **API Gateway Authorization**: Public access for testing (can be restricted later)
+
+---
+
+## Final Testing
+
+✅ Verified API responses ✅ Tested React app functionalities ✅ Monitored logs and performance metrics in AWS CloudWatch
+
+---
+
+## Deliverables
+
+- **GitHub Repository**: [GitHub Link](https://github.com/DeborahMarciano-balink/AWS-Project/tree/AWSProjectAll)
+- **Frontend URL**: [https://cloudzoneprojects.info](https://cloudzoneprojects.info)
+- **IAM Read-Only Access**: Credentials provided separately for reviewers
+- **API Gateway Endpoints**: Included in the documentation
+
+---
+
+## Conclusion
+
+This project successfully implements a **secure, scalable, and fully integrated AWS solution** for managing customer IDs. The infrastructure follows best practices for **cost efficiency, security, and performance**.
+
+---
+
+🚀 **Ready for submission!**
+
+&#x20;
