@@ -127,9 +127,9 @@ Expected response:
 
 ## Frontend Deployment
 
-- Access the deployed frontend at:
-  - 🔗 [https://cloudzoneprojects.info](https://cloudzoneprojects.info)
-- The app allows adding and verifying customer IDs
+- 🚨 **Important Notice:** HTTPS is currently not working for `https://cloudzoneprojects.info`.
+- You can access the frontend using HTTP here:
+  - 🔗 [http://customer-id-app-123.s3-website.eu-north-1.amazonaws.com/](http://customer-id-app-123.s3-website.eu-north-1.amazonaws.com/)
 
 ---
 
@@ -150,16 +150,26 @@ Expected response:
 
 ## Final Testing
 
-✅ Verified API responses ✅ Tested React app functionalities ✅ Monitored logs and performance metrics in AWS CloudWatch
+✅ Verified API responses
+✅ Tested React app functionalities
+✅ Monitored logs and performance metrics in AWS CloudWatch
 
 ---
 
 ## Deliverables
 
 - **GitHub Repository**: [GitHub Link](https://github.com/DeborahMarciano-balink/AWS-Project/tree/AWSProjectAll)
-- **Frontend URL**: [https://cloudzoneprojects.info](https://cloudzoneprojects.info)
+- **Frontend URL**: [http://customer-id-app-123.s3-website.eu-north-1.amazonaws.com/](http://customer-id-app-123.s3-website.eu-north-1.amazonaws.com/)
 - **IAM Read-Only Access**: Credentials provided separately for reviewers
 - **API Gateway Endpoints**: Included in the documentation
+
+---
+
+## AWS Console Sign-In Details
+
+- **Console Sign-In URL**: [AWS Console Sign-In](https://541153896631.signin.aws.amazon.com/console)
+- **User Name**: `UserReadOnly`
+- **Console Password**: `CloudZoneProject$`
 
 ---
 
@@ -167,6 +177,4 @@ Expected response:
 
 This project successfully implements a **secure, scalable, and fully integrated AWS solution** for managing customer IDs. The infrastructure follows best practices for **cost efficiency, security, and performance**.
 
----
-
-🚀 **Ready for submission!**
+🚀 **Note:** I purchased the domain `cloudzoneprojects.info`, but the DNS records are not yet validated. Additionally, the CloudFront trigger and Cloud Zone setup are pending. I truly enjoyed working on this project, but I need a few more hours to finalize everything completely.
