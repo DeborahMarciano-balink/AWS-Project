@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./customer-id-app/backend/lambdas/test_"
+    ]
+}
