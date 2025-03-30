@@ -170,5 +170,3 @@ This project successfully implements a **secure, scalable, and fully integrated 
 ---
 
 🚀 **Ready for submission!**
-
-&#x20;
