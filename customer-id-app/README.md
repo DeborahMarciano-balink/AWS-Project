@@ -125,6 +125,49 @@ Expected response:
 
 ---
 
+## Postman Testing
+
+### **PUT Request**
+
+```http
+PUT http://customer-id-app-123.s3-website.eu-north-1.amazonaws.com/
+
+{
+  "body": "{\"id\": \"2626\"}"
+}
+```
+
+#### **Response:**
+
+```json
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+  },
+  "body": "{\"message\": \"Client updated successfully.\", \"id\": \"2626\"}"
+}
+```
+
+### **GET Request**
+
+```http
+GET https://7firq774sg.execute-api.eu-north-1.amazonaws.com/Prod/customer/1234
+```
+
+#### **Response:**
+
+```json
+{
+  "message": "ID exists",
+  "id": "1234"
+}
+```
+
+---
+
 ## Frontend Deployment
 
 - 🚨 **Important Notice:** HTTPS is currently not working for `https://cloudzoneprojects.info`.
@@ -145,23 +188,6 @@ Expected response:
 - **IAM Role for Lambda**: Minimal permissions for DynamoDB access
 - **S3 Bucket Policy**: Restricted to CloudFront only
 - **API Gateway Authorization**: Public access for testing (can be restricted later)
-
----
-
-## Final Testing
-
-✅ Verified API responses
-✅ Tested React app functionalities
-✅ Monitored logs and performance metrics in AWS CloudWatch
-
----
-
-## Deliverables
-
-- **GitHub Repository**: [GitHub Link](https://github.com/DeborahMarciano-balink/AWS-Project/tree/AWSProjectAll)
-- **Frontend URL**: [http://customer-id-app-123.s3-website.eu-north-1.amazonaws.com/](http://customer-id-app-123.s3-website.eu-north-1.amazonaws.com/)
-- **IAM Read-Only Access**: Credentials provided separately for reviewers
-- **API Gateway Endpoints**: Included in the documentation
 
 ---
 
