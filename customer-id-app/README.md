@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a fully integrated AWS-based system that provides a REST API, a Step Functions workflow, and a React-based frontend to manage customer IDs using DynamoDB. The infrastructure is built using AWS Lambda, API Gateway, S3, CloudFront, and IAM for security.
+This project is a fully integrated AWS-based system that provides a REST API, a Step Functions workflow, and a React-based frontend to manage customer IDs using DynamoDB. The infrastructure is built using AWS Lambda, API Gateway, S3, CloudFront, EventBridge, and IAM for security.
 
 ## Table of Contents
 
@@ -11,7 +11,7 @@ This project is a fully integrated AWS-based system that provides a REST API, a 
 3. [Setup & Deployment Steps](#setup--deployment-steps)
 4. [Testing the API](#testing-the-api)
 5. [Frontend Deployment](#frontend-deployment)
-6. [Step Functions Workflow](#step-functions-workflow)
+6. [EventBridge & Step Functions Workflow](#eventbridge--step-functions-workflow)
 7. [Security & IAM](#security--iam)
 8. [Final Testing](#final-testing)
 
@@ -32,6 +32,7 @@ This project is a fully integrated AWS-based system that provides a REST API, a 
 - **React (Frontend)**: Provides a UI for adding/checking customer IDs
 - **S3 & CloudFront**: Hosts the frontend securely
 - **AWS Step Functions**: Automates customer ID management workflow
+- **Amazon EventBridge**: Facilitates event-driven communication between services
 
 ---
 
@@ -79,7 +80,15 @@ This project is a fully integrated AWS-based system that provides a REST API, a 
 - Configured an SSL certificate using **AWS Certificate Manager**
 - Linked the domain `cloudzoneprojects.info` to CloudFront
 
-### 8. Step Functions Workflow
+### 8. EventBridge & Step Functions Workflow
+
+#### **EventBridge Setup**
+
+- **Created an Event Bus** named `CustomerIDEventsBus`
+- **Defined an Event Rule** to listen for `new-customer-id` events
+- **Configured the rule to trigger Step Functions** when an event is received
+
+#### **Step Functions Workflow**
 
 - Created a **State Machine** with three Lambda functions:
   - **check_customer_id**: Checks if ID exists
@@ -87,83 +96,76 @@ This project is a fully integrated AWS-based system that provides a REST API, a 
   - **add_new_id**: Adds a new ID if it doesn’t exist
 - Triggered the Step Function using **EventBridge** on API calls
 
-### 9. Security & IAM Setup
+#### **Testing EventBridge Workflow**
+
+To manually trigger an event:
+
+```bash
+aws events put-events --entries '[
+  {
+    "Source": "myapp",
+    "DetailType": "new-customer-id",
+    "Detail": "{\"id\": \"123456\"}",
+    "EventBusName": "CustomerIDEventsBus"
+  }
+]'
+```
+
+Expected response:
+
+```json
+{
+  "FailedEntryCount": 0,
+  "Entries": [
+    {
+      "EventId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    }
+  ]
+}
+```
+
+Then, verify the execution in **AWS Step Functions**.
+
+---
+
+## Security & IAM Setup
 
 - Restricted S3 bucket access to CloudFront only
 - Created an IAM **Read-Only User** for AWS resource access
 - Ensured minimal permissions for Lambda and API Gateway
+- **Updated IAM permissions** for EventBridge to allow Step Functions execution
 
-### 10. Final Deployment & Testing
+---
+
+## Final Deployment & Testing
 
 - Deployed API Gateway and tested using **Postman & cURL**
 - Verified React app interaction with API endpoints
 - Monitored **CloudWatch logs** for debugging and performance
+- Confirmed EventBridge triggers and Step Functions execution
 
 ---
 
 ## Testing the API
 
-To test API endpoints:
-
 ### **Add a Customer ID**
 
 ```bash
-curl -X PUT https://customer-id-app-123.execute-api.region.amazonaws.com/prod/customer -d '{"id": "12345"}' -H "Content-Type: application/json"
+curl -X PUT "https://api.example.com/Prod/customer" \
+     -H "Content-Type: application/json" \
+     -d '{"body": "{\"id\": \"2626\"}"}'
 ```
 
 ### **Check if a Customer ID Exists**
 
 ```bash
-curl -X GET https://customer-id-app-123.execute-api.region.amazonaws.com/prod/customer?id=12345
+curl -X GET "https://api.example.com/Prod/customer?id=12345"
 ```
 
 Expected response:
 
 ```json
 { "exists": true }
-```
-
----
-
-## Postman Testing
-
-### **PUT Request**
-
-```http
-PUT http://customer-id-app-123.s3-website.eu-north-1.amazonaws.com/
-
-{
-  "body": "{\"id\": \"2626\"}"
-}
-```
-
-#### **Response:**
-
-```json
-{
-  "statusCode": 200,
-  "headers": {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization"
-  },
-  "body": "{\"message\": \"Client updated successfully.\", \"id\": \"2626\"}"
-}
-```
-
-### **GET Request**
-
-```http
-GET https://7firq774sg.execute-api.eu-north-1.amazonaws.com/Prod/customer/1234
-```
-
-#### **Response:**
-
-```json
-{
-  "message": "ID exists",
-  "id": "1234"
-}
 ```
 
 ---
@@ -176,24 +178,9 @@ GET https://7firq774sg.execute-api.eu-north-1.amazonaws.com/Prod/customer/1234
 
 ---
 
-## Step Functions Workflow
-
-- Triggered automatically when a new customer ID is submitted
-- Can be monitored in AWS Step Functions console
-
----
-
-## Security & IAM
-
-- **IAM Role for Lambda**: Minimal permissions for DynamoDB access
-- **S3 Bucket Policy**: Restricted to CloudFront only
-- **API Gateway Authorization**: Public access for testing (can be restricted later)
-
----
-
 ## AWS Console Sign-In Details
 
-- **Console Sign-In URL**: [AWS Console Sign-In](https://541153896631.signin.aws.amazon.com/console)
+- **Console Sign-In URL**: [AWS Console Sign-In](https://signin.aws.amazon.com)
 - **User Name**: `UserReadOnly`
 - **Console Password**: `CloudZoneProject$`
 
@@ -203,4 +190,4 @@ GET https://7firq774sg.execute-api.eu-north-1.amazonaws.com/Prod/customer/1234
 
 This project successfully implements a **secure, scalable, and fully integrated AWS solution** for managing customer IDs. The infrastructure follows best practices for **cost efficiency, security, and performance**.
 
-🚀 **Note:** I purchased the domain `cloudzoneprojects.info`, but the DNS records are not yet validated. Additionally, the CloudFront trigger and Cloud Zone setup are pending. I truly enjoyed working on this project, but I need a few more hours to finalize everything completely.
+🚀 **Note:** The CloudFront trigger and Cloud Zone setup are pending. I truly enjoyed working on this project, but I need a few more hours to finalize everything completely.
