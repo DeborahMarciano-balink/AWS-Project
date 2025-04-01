@@ -9,7 +9,6 @@ def lambda_handler(event, context):
     if not customer_id:
         return {"status": "error", "message": "No customer_id provided"}
 
-    # Insérer un nouvel ID dans DynamoDB
     table.put_item(Item={'id': customer_id})
     
     return {"status": "success", "message": "Customer ID added successfully"}
